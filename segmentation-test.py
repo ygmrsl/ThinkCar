@@ -6,9 +6,9 @@ Created on Mon Apr  5 15:43:21 2021
 """
 import os
 os.chdir(r"C:\Users\admin\Desktop\Image-Segmentation\ThinkCar")
-outputdir = r"C:\Users\admin\Desktop"
+outputdir = r"C:\Users\admin\Desktop/"
 rootdir = r"C:\Users\admin\Desktop\Image-Segmentation\ThinkCar"
-inputdir = r"C:\Users\admin\Desktop\ThinkCar\WindowsNoEditor\scenario_runner-0.9.10\_out"
+inputdir = r"C:\Users\admin\Desktop\recording2"
 import torch
 import numpy as np
 import torchvision as vis
@@ -68,7 +68,44 @@ classes = [
     CityscapesClass('license plate', -1, -1, 'vehicle', 7, False, True, (0, 0, 142)),
 ]
 
+ethicMap = {
+    0:0,
+    1:0,
+    2:0,
+    3:0,
+    4:0,
+    5:0,
+    6:0,
+    7:0,
+    8:1,
+    9:1,
+    10:1,
+    11:3,
+    12:3,
+    13:2,
+    14:3,
+    15:0,
+    16:0,
+    17:2,
+    18:2,
+    19:2,
+    20:2,
+    21:2,
+    22:0,
+    23:0,
+    24:5,
+    25:5,
+    26:4,
+    27:5,
+    28:5,
+    29:5,
+    30:4,
+    31:5,
+    32:5,
+    33:5 
+    }
 
+#%%
 class ToTensor(object):
     def __call__(self, target):
         target = torch.as_tensor(np.array(target), dtype=torch.int64)
@@ -85,13 +122,25 @@ def criterion(inputs, target):
 
     return losses['out'] + 0.5 * losses['aux']
 
+def map_mask(masks):
+    dim = masks.shape[0]
+    for i in range(dim):
+        target = masks[i]
+        clss = sorted(np.unique(target))
+        for j in clss:
+            target = np.where(target==j, ethicMap[j], target)
+        masks[i] = target
+    return masks
+    
 def train_one_epoch(model, criterion, optimizer, data_loader, lr_scheduler, device, epoch, print_freq):
     model.train()
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value}'))
     header = 'Epoch: [{}]'.format(epoch)
     for image, target in metric_logger.log_every(data_loader, print_freq, header):
-        target = torch.LongTensor(np.array(target).astype(np.int64))
+        target = np.array(target).astype(np.int64)
+        target = map_mask(target)
+        target = torch.LongTensor(target)
         image, target = image.to(device), target.to(device)
         output = model(image)
         loss = criterion(output, target)
@@ -111,7 +160,9 @@ def evaluate(model, data_loader, device, num_classes):
     header = 'Test:'
     with torch.no_grad():
         for image, target in metric_logger.log_every(data_loader, 100, header):
-            target = torch.LongTensor(np.array(target).astype(np.int64))
+            target = np.array(target).astype(np.int64)
+            target = map_mask(target)
+            target = torch.LongTensor(target)
             torch.cuda.empty_cache()
             image, target = image.to(device), target.to(device)
             output = model(image)
@@ -130,7 +181,7 @@ def get_transform(train):
 
     return presets.SegmentationPresetTrain(base_size, crop_size) if train else presets.SegmentationPresetEval(base_size)
 #%%
-root = "./CityScapes/"
+root = outputdir + "CityScapes/"
 transform = t.Compose([t.Resize(256), t.ToTensor()])
 ttransform = t.Compose([t.Resize(256, 0), ToTensor()])
 datasetTrain = Cityscapes(root=root, split="train", mode="fine",
@@ -144,10 +195,10 @@ datasetVal = Cityscapes(root=root, split="val", mode="fine",
 valLoader = DataLoader(datasetVal, batch_size=2, shuffle=True, collate_fn=utils.collate_fn, drop_last=True)
 trainLoader = DataLoader(datasetTrain, batch_size=2, shuffle=True, collate_fn=utils.collate_fn, drop_last=True)
 #%%
-num_epochs = 10
+num_epochs = 20
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-model = seg.deeplabv3_resnet101(num_classes=35)
-model.classifier = DeepLabHead(2048, 35)
+model = seg.deeplabv3_resnet101(num_classes=6)
+model.classifier = DeepLabHead(2048, 6)
 model.to(device)
 params = [p for p in model.parameters() if p.requires_grad]
 optimizer = torch.optim.SGD(params, lr=0.02, momentum=0.9, weight_decay=0.0005)
@@ -155,7 +206,7 @@ lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=4000, gamma=
 
 for epoch in range(1,num_epochs+1):
     train_one_epoch(model, criterion, optimizer, trainLoader, lr_scheduler, device, epoch, 100)
-    confmat = evaluate(model, valLoader, device=device, num_classes=35)
+    confmat = evaluate(model, valLoader, device=device, num_classes=6)
     print(confmat)
     utils.save_on_master(
             {
@@ -168,10 +219,10 @@ for epoch in range(1,num_epochs+1):
     
 #%%
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-model = seg.deeplabv3_resnet101(num_classes=35)
-model.classifier = DeepLabHead(2048, 35)
+model = seg.deeplabv3_resnet101(num_classes=6)
+model.classifier = DeepLabHead(2048, 6)
 model.to(device)
-mdl = torch.load("./models/model10.pth")
+mdl = torch.load(outputdir + "/model13.pth")
 
 model.load_state_dict(mdl["model"])
     
@@ -184,10 +235,13 @@ images = sorted(glob(inputdir+"/*.png"))
 
 #%%
 
-colors = []
+colors = [(0,255,255), (0,255,0), (128,255,0), (255,255,0), (255,128,0), (255,0,0)]
+
+#colors = [(255,0,0), (255,0,0), (255,0,0), (255,0,0), (255,0,0), (255,0,0)]
+'''
 for clas in classes:
     colors.append(clas[-1])
-
+'''
 for image in images:
 
     im = Image.open(image).convert("RGB")
@@ -209,9 +263,9 @@ for image in images:
     for i in range(im.size[1]):
         for j in range(im.size[0]):
             px = r.getpixel((j,i))
-            mask[i,j,0] = colors[px-1][0]
-            mask[i,j,1] = colors[px-1][1]
-            mask[i,j,2] = colors[px-1][2]
+            mask[i,j,0] = colors[px][0]
+            mask[i,j,1] = colors[px][1]
+            mask[i,j,2] = colors[px][2]
     mask = mask.astype(np.uint8)
     
     m = Image.fromarray(mask)
