@@ -5,10 +5,10 @@ Created on Mon Apr  5 15:43:21 2021
 @author: admin
 """
 import os
-os.chdir(r"C:\Users\admin\Desktop\Image-Segmentation\ThinkCar")
-outputdir = r"C:\Users\admin\Desktop/"
+os.chdir(r"E:\GitHub\ThinkCar")
+outputdir = r"E:\GitHub\ThinkCar"
 rootdir = r"C:\Users\admin\Desktop\Image-Segmentation\ThinkCar"
-inputdir = r"C:\Users\admin\Desktop\recording2"
+inputdir = r"E:\carla\CARLA_0.9.10\WindowsNoEditor\PythonAPI\examples\_out"
 import torch
 import numpy as np
 import torchvision as vis

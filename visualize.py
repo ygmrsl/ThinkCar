@@ -14,8 +14,7 @@ from PIL import Image
 
 #%%
 
-inputdir = r"C:\Users\admin\Desktop\ThinkCar\WindowsNoEditor\scenario_runner-0.9.10\_out"
-inputdir = r"C:\Users\admin\Desktop\recording2"
+inputdir = r"E:\carla\CARLA_0.9.10\WindowsNoEditor\PythonAPI\examples\_out"
 pths = sorted(glob(inputdir+"/*.png"))
 
 #%%
@@ -44,7 +43,7 @@ for pth in pths:
         h, w, l = image.shape
         size = (w,h)
 
-vid = cv2.VideoWriter(r"C:\Users\admin\Desktop\test_long2.avi", -1, 15, size)
+vid = cv2.VideoWriter(r"E:\videolar\test_long3.avi", cv2.VideoWriter_fourcc(*'DIVX'), 10, size)
 for i in image_array:
     vid.write(i)
 vid.release()
