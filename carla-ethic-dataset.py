@@ -81,10 +81,12 @@ class EthicsCaseNet(torch.nn.Module):
         self.dropout = torch.nn.Dropout(0.2)
         
     def forward(self, x1,x2):
+        #print(x1.shape)
         x1 = self.pool(F.relu(self.conv1(x1)))
         x1 = self.pool(F.relu(self.conv2(x1)))
         x1 = self.pool(F.relu(self.conv3(x1)))
         #print(x1.shape)
+        #print(x2.shape)
         x1 = x1.view(-1,32*30*55)
         x2 = torch.unsqueeze(x2, dim=1)
         #print(x1.shape, x2.shape)
