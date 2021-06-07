@@ -1036,12 +1036,15 @@ class CameraManager(object):
 		if self.send:
 			#print(type(image.raw_data))
 			img = self.process_img(image)
-			test = self.engine.process_segmentation(img)
-			print(test.shape)
+			test,mask = self.engine.process_segmentation(img)
+			#print(test.shape)
+			t = test.detach().cpu().numpy()[0]
+			#print(mask.shape)
+			#print(mask)
 			v = self._parent.get_velocity()
 			speed = 3.6 * math.sqrt(v.x**2 + v.y**2 + v.z**2)
 			speed = self.engine.process_speed(speed)
-			print(speed.shape)
+			#print(speed.shape)
 			seg_img = self.engine.process_segmented_output(test)
 			self.engine.process_ethical_decision(seg_img, speed)
 			#print('Speed:	  % 15.0f km/h' % (3.6 * math.sqrt(v.x**2 + v.y**2 + v.z**2)))
