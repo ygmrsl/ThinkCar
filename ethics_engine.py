@@ -66,19 +66,19 @@ class EthicsEngine:
     
     def process_speed(self, speed):
         if speed < 10:
-            speed = 0
+            speed_val = 0
         elif speed <20:
-            speed = 1
+            speed_val = 1
         elif speed <30:
-            speed = 2
+            speed_val = 2
         elif speed <40:
-            speed = 3
+            speed_val = 3
         else:
-            speed = 4
-        print(speed)
-        speed = np.array([speed])
+            speed_val = 4
+        #print(speed_val)
+        speed = np.array([speed_val])
         speed = torch.as_tensor(speed, dtype=torch.uint8)
-        return speed
+        return speed, speed_val
     
     def process_segmented_output(self, out):
         dims = out.shape
@@ -90,7 +90,7 @@ class EthicsEngine:
         colors = [(0,255,255), (0,255,0), (128,255,0), (255,255,0), (255,128,0), (255,0,0)]
         inp = self.process_image(inp)
         inp = inp.to(self.device)
-        print(inp.shape)
+        #print(inp.shape)
         out = self.seg_model(inp)
         op = out["out"].detach().cpu().numpy()
         cop=op.argmax(1)
@@ -111,7 +111,7 @@ class EthicsEngine:
         pil = t.ToPILImage()
         #image = pil(m)
         image = transform(m)
-        return image
+        return image,mask
     
     def process_ethical_decision(self, image, speed):
         classes = ["Ethical", "Not Ethical"]
@@ -119,7 +119,7 @@ class EthicsEngine:
         speed = speed.to(self.device)
         output = self.case_model(image, speed)
         _, pred = torch.max(output, 1)
-        print(pred)
+        #print("pred",pred)
         res = pred.detach().cpu().numpy()[0]
-        print(classes[pred])
-        
+        #print("classes",classes[pred])
+        return pred

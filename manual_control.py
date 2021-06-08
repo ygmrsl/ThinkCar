@@ -88,6 +88,13 @@ import re
 import weakref
 
 from ethics_engine import EthicsEngine
+from rule_based_engine import rule_based_engine
+import torch
+from PIL import Image
+import matplotlib.pyplot as plt
+from torchvision import transforms
+
+unloader = transforms.ToPILImage()
 
 try:
 	import pygame
@@ -899,7 +906,8 @@ class RadarSensor(object):
 
 class CameraManager(object):
 	def __init__(self, parent_actor, hud, gamma_correction):
-		pth = r"E:\GitHub\ThinkCar/"
+		#pth = r"E:\GitHub\ThinkCar/"
+		pth = r"C:\Users\gizay\Desktop\ThinkCar\WindowsNoEditor\PythonAPI\ThinkCar/"
 		self.engine = EthicsEngine(pth+"model13.pth", pth+"ethic_model.pth")
 		self.sensor = None
 		self.surface = None
@@ -1036,14 +1044,22 @@ class CameraManager(object):
 		if self.send:
 			#print(type(image.raw_data))
 			img = self.process_img(image)
-			test = self.engine.process_segmentation(img)
-			print(test.shape)
+			test,seg_mask = self.engine.process_segmentation(img)
+			#print(test.shape)
 			v = self._parent.get_velocity()
 			speed = 3.6 * math.sqrt(v.x**2 + v.y**2 + v.z**2)
-			speed = self.engine.process_speed(speed)
-			print(speed.shape)
+			speed, speed_val = self.engine.process_speed(speed)
+			#print(speed.shape)
 			seg_img = self.engine.process_segmented_output(test)
-			self.engine.process_ethical_decision(seg_img, speed)
+			decision = self.engine.process_ethical_decision(seg_img, speed)
+			if (decision == 1):
+				image = Image.fromarray(seg_mask)
+				#image = seg_img.cpu().clone()
+				#image = image.squeeze(0)
+				#image = unloader(image)
+				#image = image.resize((1280,720),Image.NEAREST)
+				rbe_steer, rbe_throttle, rbe_brake = rule_based_engine(image,speed_val)
+				print("steer ",rbe_steer," throttle ",rbe_throttle, " brake ",rbe_brake)
 			#print('Speed:	  % 15.0f km/h' % (3.6 * math.sqrt(v.x**2 + v.y**2 + v.z**2)))
 
 
@@ -1146,7 +1162,7 @@ def main():
 
 	logging.info('listening to server %s:%s', args.host, args.port)
 
-	print(__doc__)
+	#print(__doc__)
 
 	try:
 
