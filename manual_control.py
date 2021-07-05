@@ -285,6 +285,10 @@ class World(object):
 		if self.player is not None:
 			self.player.destroy()
 
+	def car_controller(self):
+		decision,brake,throttle,steer = self.camera_manager.get_from_rule_based()
+		return decision,brake,throttle,steer
+
 
 # ==============================================================================
 # -- KeyboardControl -----------------------------------------------------------
@@ -502,7 +506,13 @@ class KeyboardControl(object):
 	def _is_quit_shortcut(key):
 		return (key == K_ESCAPE) or (key == K_q and pygame.key.get_mods() & KMOD_CTRL)
 
+	def get_control(self):
+		return self._control
 
+	def set_controls(self,rbe_brake,rbe_throttle,rbe_steer):
+		self._control.brake = rbe_brake
+		self._control.throttle = rbe_throttle
+		self._control.steer = rbe_steer
 # ==============================================================================
 # -- HUD -----------------------------------------------------------------------
 # ==============================================================================
@@ -915,6 +925,11 @@ class CameraManager(object):
 		self.hud = hud
 		self.recording = False
 		self.send = True
+		self.decision = 0
+		self.throttle = 0.5
+		self.brake = 0.0
+		self.steer = 0.0
+		
 		bound_y = 0.5 + self._parent.bounding_box.extent.y
 		Attachment = carla.AttachmentType
 		self._camera_transforms = [
@@ -1051,17 +1066,19 @@ class CameraManager(object):
 			speed, speed_val = self.engine.process_speed(speed)
 			#print(speed.shape)
 			seg_img = self.engine.process_segmented_output(test)
-			decision = self.engine.process_ethical_decision(seg_img, speed)
-			if (decision == 1):
+			self.decision = self.engine.process_ethical_decision(seg_img, speed)
+			if (self.decision == 1):
 				image = Image.fromarray(seg_mask)
-				#image = seg_img.cpu().clone()
-				#image = image.squeeze(0)
-				#image = unloader(image)
-				#image = image.resize((1280,720),Image.NEAREST)
-				rbe_steer, rbe_throttle, rbe_brake = rule_based_engine(image,speed_val)
-				print("steer ",rbe_steer," throttle ",rbe_throttle, " brake ",rbe_brake)
+				rbe_steer, rbe_throttle, rbe_brake = rule_based_engine.start(image,speed_val)
 			#print('Speed:	  % 15.0f km/h' % (3.6 * math.sqrt(v.x**2 + v.y**2 + v.z**2)))
+				self.throttle = rbe_throttle
+				self.brake = rbe_brake
+				self.steer = rbe_steer
+				self.throttle = 0.5
+			
 
+	def get_from_rule_based(self):
+		return self.decision, self.brake, self.throttle, self.steer
 
 # ==============================================================================
 # -- game_loop() ---------------------------------------------------------------
@@ -1088,6 +1105,11 @@ def game_loop(args):
 		clock = pygame.time.Clock()
 		while True:
 			clock.tick_busy_loop(60)
+			decision,brake,throttle,steer = world.car_controller()
+			if(decision == 1):
+				controller.set_controls(brake,throttle,steer)
+				#print("steer ",steer," throttle ",throttle, " brake ",brake)
+				decision = 0
 			if controller.parse_events(client, world, clock):
 				return
 			world.tick(clock)
