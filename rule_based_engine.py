@@ -20,11 +20,11 @@ class rule_based_engine:
     def start(self, image, speed):
         frames = self.split_frames(image)
         selected_side = sorted(frames, key=lambda frames: frames[1])[0]
-        if selected_side[0] == 6:  # GO LEFT
+        if selected_side[0] == 3:  # GO LEFT
             self.steer = -self.steer_for_speed.get(speed)
-        elif selected_side[0] == 7:  # GO STRAIGHT
+        elif selected_side[0] == 4:  # GO STRAIGHT
             self.steer = 0.0
-        elif selected_side[0] == 8:  # GO RIGHT
+        elif selected_side[0] == 5:  # GO RIGHT
             self.steer = self.steer_for_speed.get(speed)
         if selected_side[1] > 350:
             self.brake = 1 * self.brake_for_speed.get(speed)
@@ -87,16 +87,16 @@ class rule_based_engine:
 
     def split_frames(image):
         imgwidth, imgheight = image.size
-        height = np.int(imgheight / 4)
+        height = np.int(imgheight / 3)
         width = np.int(imgwidth / 3)
         start_num = 0
         frame_list = []
         for k, piece in enumerate(self.crop(image, height, width), start_num):
-            if 5 < k < 9:
+            if 2 < k < 6:
                 img = Image.new('RGB', (width, height), 255)
                 img.paste(piece)
                 total_ratio = self.get_colors_ratio(img)
-                if k == 7:
+                if k == 4:
                     frame_list.insert(0, (k, total_ratio))
                 else:
                     frame_list.append((k, total_ratio))
