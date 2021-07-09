@@ -1,8 +1,8 @@
-# ThinkCar
+ThinkCar is an image segmentation-based ethics engine designed for autonomous vehicles.
+The engine has been tested on CARLA Simulator and all tests have been done there.
+Therefore, in order to use ThinkCar, the CARLA Simulator must be installed on the system.
 
-Merhaba, 
+                            Good luck,
+                            ThinkCar Team
 
-Bu bizim bitirme projemiz için açtığımız bir repo. 
-
-
-Bye..
+***You can contact us via discord at the link: https://discord.gg/7s6QbZTN
