@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<scenarios>
+	<scenario name="ThinkCarScenarioWithWalkers" type="ThinkCarScenario" town="Town01">
+        <ego_vehicle x="100" y="59" z="1" yaw="360" model="vehicle.tesla.model3" />
+        <other_actor x="125" y="56" z="1" yaw="180" model="vehicle.mercedesccc.mercedesccc"/>
+		<other_actor x="125" y="59" z="1" yaw="360" model="vehicle.carlamotors.carlacola" />
+		<other_actor x="140" y="59" z="1" yaw="360" model="vehicle.nissan.patrol" />
+	
+		<other_actor x="123" y="64" z="1" yaw="270" model="walker.pedestrian.0002" />
+		<other_actor x="124" y="64" z="1" yaw="270" model="walker.pedestrian.0012" />
+		<other_actor x="125" y="62" z="1" yaw="270" model="walker.pedestrian.0024" />
+		<other_actor x="126" y="64" z="1" yaw="270" model="walker.pedestrian.0015" />
+		<other_actor x="124" y="62" z="1" yaw="270" model="walker.pedestrian.0009" />
+		<other_actor x="125" y="63" z="1" yaw="270" model="walker.pedestrian.0008" />
+		<other_actor x="123" y="62" z="1" yaw="270" model="walker.pedestrian.0007" />
+		<other_actor x="126" y="62" z="1" yaw="270" model="walker.pedestrian.0017" />
+
+
+		<other_actor x="131.93760681152344" y="69.5031509399414" z="1" yaw="270" model="vehicle.nissan.patrol" />
+		
+		
+		
+		
+		
+    </scenario>
+	<scenario name="ThinkCarScenarioWithoutWalkers" type="ThinkCarScenario" town="Town01">
+          <ego_vehicle x="100" y="59" z="1" yaw="360" model="vehicle.tesla.model3" />
+        <other_actor x="125" y="56" z="1" yaw="180" model="vehicle.mercedesccc.mercedesccc"/>
+		<other_actor x="125" y="59" z="1" yaw="360" model="vehicle.carlamotors.carlacola" />
+		<other_actor x="120" y="52" z="1" yaw="180" model="walker.pedestrian.0009" />
+		<other_actor x="121" y="52" z="1" yaw="180" model="walker.pedestrian.0008" />
+		<other_actor x="120" y="51" z="1" yaw="180" model="walker.pedestrian.0007" />
+		<other_actor x="148" y="59" z="1" yaw="360" model="vehicle.nissan.patrol" />
+		
+
+		
+    </scenario>
+	
+	<scenario name="ThinkCarScenarioWithWalkersWithoutMercedes" type="ThinkCarScenario" town="Town01">
+        <ego_vehicle x="100" y="59" z="1" yaw="360" model="vehicle.tesla.model3" />
+      
+		<other_actor x="125" y="59" z="1" yaw="360" model="vehicle.carlamotors.carlacola" />
+		<other_actor x="140" y="59" z="1" yaw="360" model="vehicle.nissan.patrol" />
+	
+		<other_actor x="123" y="64" z="1" yaw="270" model="walker.pedestrian.0002" />
+		<other_actor x="124" y="64" z="1" yaw="270" model="walker.pedestrian.0012" />
+		<other_actor x="125" y="62" z="1" yaw="270" model="walker.pedestrian.0024" />
+		<other_actor x="126" y="64" z="1" yaw="270" model="walker.pedestrian.0015" />
+		<other_actor x="124" y="62" z="1" yaw="270" model="walker.pedestrian.0009" />
+		<other_actor x="125" y="63" z="1" yaw="270" model="walker.pedestrian.0008" />
+		<other_actor x="123" y="62" z="1" yaw="270" model="walker.pedestrian.0007" />
+		<other_actor x="126" y="62" z="1" yaw="270" model="walker.pedestrian.0017" />
+
+
+		<other_actor x="131.93760681152344" y="69.5031509399414" z="1" yaw="270" model="vehicle.nissan.patrol" />
+		
+		
+		
+		
+		
+    </scenario>
+	
+</scenarios>
